@@ -1,0 +1,748 @@
+    <!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voz dos Avós - Entretenimento</title>
+    <style>
+        /* Reset e configurações básicas */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #D4A574; /* Amarelo mostarda */
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Bolhas de fundo */
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            z-index: 0;
+        }
+        
+        /* Container principal */
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background-color: #F8F5F2; /* Branco nuvem */
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(196, 98, 98, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Cabeçalho */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #E3A873; /* Laranja acolhedor */
+            position: relative;
+        }
+        
+        h1 {
+            color: #6A8EAE; /* Azul sereno */
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #9A7AA0; /* Roxo acalmado */
+            font-size: 1.2rem;
+        }
+        
+        .level-indicator {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: #8DB580; /* Verde esperança */
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        /* Lista vertical de atividades */
+        .activities-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .activity-card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .activity-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .activity-icon {
+            font-size: 2.5rem;
+            margin-right: 20px;
+            width: 60px;
+            text-align: center;
+        }
+        
+        .activity-info {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .activity-description {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        /* Páginas de jogo (inicialmente ocultas) */
+        .game-page {
+            display: none;
+            width: 100%;
+            max-width: 500px;
+            background-color: #F8F5F2;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .game-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .back-button {
+            background-color: transparent;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            margin-right: 15px;
+            color: #6A8EAE;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+        
+        .back-button:hover {
+            background-color: rgba(106, 142, 174, 0.1);
+        }
+        
+        .game-title {
+            font-size: 1.5rem;
+            color: #6A8EAE;
+        }
+        
+        .game-level {
+            margin-left: auto;
+            background-color: #E3A873;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        /* Jogo da Memória */
+        .memory-game {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .memory-card {
+            height: 70px;
+            background-color: #8DB580; /* Verde esperança */
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.5s;
+            transform-style: preserve-3d;
+        }
+        
+        .memory-card.flipped {
+            transform: rotateY(180deg);
+            background-color: #F8F5F2;
+        }
+        
+        .memory-card.matched {
+            background-color: #E3A873; /* Laranja acolhedor */
+            cursor: default;
+        }
+        
+        /* Comemoração */
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            flex-direction: column;
+        }
+        
+        .celebration-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 80%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .celebration-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        .celebration-title {
+            font-size: 2rem;
+            color: #6A8EAE;
+            margin-bottom: 10px;
+        }
+        
+        .celebration-message {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .celebration-button {
+            background-color: #8DB580;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 25px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .celebration-button:hover {
+            background-color: #7ca572;
+        }
+        
+        /* Estatísticas */
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #6A8EAE;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        /* Ajustes para acessibilidade */
+        button, .activity-card {
+            font-size: 1.1rem;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 500px) {
+            .memory-game {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .activity-card {
+                padding: 15px;
+            }
+            
+            .activity-icon {
+                font-size: 2rem;
+                margin-right: 15px;
+                width: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Bolhas de fundo -->
+    <div id="bubblesContainer"></div>
+    
+    <!-- Página inicial com as atividades -->
+    <div class="container" id="mainPage">
+        <header>
+            <h1>Voz dos Avós</h1>
+            <p class="subtitle">Atividades para exercitar a mente</p>
+            <div class="level-indicator">Nível: <span id="userLevel">1</span></div>
+        </header>
+        
+        <div class="activities-list">
+            <div class="activity-card" data-game="memory">
+                <div class="activity-icon">🧠</div>
+                <div class="activity-info">
+                    <div class="activity-title">Jogo da Memória</div>
+                    <div class="activity-description">Encontre os pares de cartas iguais</div>
+                </div>
+            </div>
+            <div class="activity-card" data-game="crossword">
+                <div class="activity-icon">✏️</div>
+                <div class="activity-info">
+                    <div class="activity-title">Palavras Cruzadas</div>
+                    <div class="activity-description">Complete as palavras no diagrama</div>
+                </div>
+            </div>
+            <div class="activity-card" data-game="puzzle">
+                <div class="activity-icon">🧩</div>
+                <div class="activity-info">
+                    <div class="activity-title">Quebra-Cabeças</div>
+                    <div class="activity-description">Organize as peças na ordem correta</div>
+                </div>
+            </div>
+            <div class="activity-card" data-game="logic">
+                <div class="activity-icon">🔍</div>
+                <div class="activity-info">
+                    <div class="activity-title">Raciocínio Lógico</div>
+                    <div class="activity-description">Resolva problemas de lógica</div>
+                </div>
+            </div>
+            <div class="activity-card" data-game="sudoku">
+                <div class="activity-icon">🔢</div>
+                <div class="activity-info">
+                    <div class="activity-title">Sudoku Fácil</div>
+                    <div class="activity-description">Preencha os números faltantes</div>
+                </div>
+            </div>
+            <div class="activity-card" data-game="differences">
+                <div class="activity-icon">👁️</div>
+                <div class="activity-info">
+                    <div class="activity-title">Encontre as Diferenças</div>
+                    <div class="activity-description">Identifique as diferenças entre imagens</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="gamesPlayed">0</div>
+                <div class="stat-label">Jogos Jogados</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="gamesWon">0</div>
+                <div class="stat-label">Jogos Vencidos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="timePlayed">0 min</div>
+                <div class="stat-label">Tempo Jogando</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Página do Jogo da Memória -->
+    <div class="game-page" id="memoryGamePage">
+        <div class="game-header">
+            <button class="back-button">←</button>
+            <h2 class="game-title">Jogo da Memória</h2>
+            <div class="game-level">Nível <span id="memoryLevel">1</span></div>
+        </div>
+        
+        <div id="memoryGameContent"></div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="memoryPairs">0</div>
+                <div class="stat-label">Pares Encontrados</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="memoryMoves">0</div>
+                <div class="stat-label">Movimentos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="memoryTime">0s</div>
+                <div class="stat-label">Tempo</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tela de comemoração -->
+    <div class="celebration" id="celebration">
+        <div class="celebration-content">
+            <div class="celebration-icon" id="celebrationIcon">🎉</div>
+            <h2 class="celebration-title" id="celebrationTitle">Parabéns!</h2>
+            <p class="celebration-message" id="celebrationMessage">Você completou o nível!</p>
+            <button class="celebration-button" id="celebrationButton">Continuar</button>
+        </div>
+    </div>
+
+    <script>
+        // Elementos DOM
+        const mainPage = document.getElementById('mainPage');
+        const memoryGamePage = document.getElementById('memoryGamePage');
+        const activityCards = document.querySelectorAll('.activity-card');
+        const backButtons = document.querySelectorAll('.back-button');
+        const celebration = document.getElementById('celebration');
+        const celebrationButton = document.getElementById('celebrationButton');
+        const userLevelEl = document.getElementById('userLevel');
+        const memoryLevelEl = document.getElementById('memoryLevel');
+        const gamesPlayedEl = document.getElementById('gamesPlayed');
+        const gamesWonEl = document.getElementById('gamesWon');
+        const timePlayedEl = document.getElementById('timePlayed');
+        const memoryPairsEl = document.getElementById('memoryPairs');
+        const memoryMovesEl = document.getElementById('memoryMoves');
+        const memoryTimeEl = document.getElementById('memoryTime');
+        const bubblesContainer = document.getElementById('bubblesContainer');
+        
+        // Dados do usuário
+        let userData = {
+            level: 1,
+            gamesPlayed: 0,
+            gamesWon: 0,
+            timePlayed: 0, // em minutos
+            memory: {
+                level: 1,
+                pairsFound: 0,
+                moves: 0,
+                time: 0
+            }
+        };
+        
+        // Variáveis do jogo da memória
+        let memoryCards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let totalPairs = 0;
+        let memoryMoves = 0;
+        let memoryTimer = null;
+        let memorySeconds = 0;
+        
+        // Inicialização
+        function init() {
+            loadUserData();
+            createBubbles();
+            setupEventListeners();
+            updateDisplay();
+        }
+        
+        // Criar bolhas de fundo
+        function createBubbles() {
+            const bubbleCount = 15;
+            
+            for (let i = 0; i < bubbleCount; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                
+                // Tamanho aleatório entre 20px e 80px
+                const size = Math.floor(Math.random() * 60) + 20;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                
+                // Posição aleatória na tela
+                bubble.style.left = `${Math.random() * 100}%`;
+                bubble.style.top = `${Math.random() * 100}%`;
+                
+                // Cor suave aleatória
+                const colors = [
+                    'rgba(106, 142, 174, 0.2)',  // Azul sereno
+                    'rgba(141, 181, 128, 0.2)',  // Verde esperança
+                    'rgba(209, 123, 106, 0.2)',  // Vermelho terroso
+                    'rgba(154, 122, 160, 0.2)',  // Roxo acalmado
+                    'rgba(227, 168, 115, 0.2)'   // Laranja acolhedor
+                ];
+                bubble.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                bubblesContainer.appendChild(bubble);
+            }
+        }
+        
+        // Configurar eventos
+        function setupEventListeners() {
+            // Eventos para os cards de atividade
+            activityCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const gameType = card.getAttribute('data-game');
+                    openGamePage(gameType);
+                });
+            });
+            
+            // Eventos para os botões de voltar
+            backButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    closeGamePage();
+                });
+            });
+            
+            // Evento para o botão de comemoração
+            celebrationButton.addEventListener('click', () => {
+                celebration.style.display = 'none';
+            });
+        }
+        
+        // Carregar dados do usuário do localStorage
+        function loadUserData() {
+            const savedData = localStorage.getItem('vozDosAvosData');
+            if (savedData) {
+                userData = JSON.parse(savedData);
+            }
+        }
+        
+        // Salvar dados do usuário no localStorage
+        function saveUserData() {
+            localStorage.setItem('vozDosAvosData', JSON.stringify(userData));
+        }
+        
+        // Atualizar exibição
+        function updateDisplay() {
+            userLevelEl.textContent = userData.level;
+            gamesPlayedEl.textContent = userData.gamesPlayed;
+            gamesWonEl.textContent = userData.gamesWon;
+            timePlayedEl.textContent = userData.timePlayed + ' min';
+        }
+        
+        // Abrir página do jogo
+        function openGamePage(gameType) {
+            mainPage.style.display = 'none';
+            
+            switch(gameType) {
+                case 'memory':
+                    memoryGamePage.style.display = 'block';
+                    setupMemoryGame();
+                    break;
+                // Outros jogos podem ser implementados aqui
+            }
+            
+            userData.gamesPlayed++;
+            saveUserData();
+            updateDisplay();
+        }
+        
+        // Fechar página do jogo
+        function closeGamePage() {
+            // Parar temporizador do jogo da memória
+            if (memoryTimer) {
+                clearInterval(memoryTimer);
+                memoryTimer = null;
+            }
+            
+            // Esconder todas as páginas de jogo
+            document.querySelectorAll('.game-page').forEach(page => {
+                page.style.display = 'none';
+            });
+            
+            // Mostrar página principal
+            mainPage.style.display = 'block';
+        }
+        
+        // Configurar Jogo da Memória
+        function setupMemoryGame() {
+            const memoryGameContent = document.getElementById('memoryGameContent');
+            memoryGameContent.innerHTML = '';
+            
+            // Definir número de pares baseado no nível
+            totalPairs = 4 + userData.memory.level; // 5 pares no nível 1, 6 no nível 2, etc.
+            if (totalPairs > 8) totalPairs = 8; // Máximo de 8 pares (16 cartas)
+            
+            // Criar símbolos para as cartas
+            const symbols = ['🍎', '🍌', '🍒', '🍇', '🍊', '🍓', '🥝', '🍉', '🥭', '🍑'];
+            const selectedSymbols = symbols.slice(0, totalPairs);
+            memoryCards = [...selectedSymbols, ...selectedSymbols];
+            
+            // Embaralhar cartas
+            for (let i = memoryCards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [memoryCards[i], memoryCards[j]] = [memoryCards[j], memoryCards[i]];
+            }
+            
+            // Criar grade de cartas
+            const memoryGame = document.createElement('div');
+            memoryGame.className = 'memory-game';
+            
+            // Ajustar grade baseado no número de cartas
+            if (totalPairs <= 6) {
+                memoryGame.style.gridTemplateColumns = 'repeat(3, 1fr)';
+            } else {
+                memoryGame.style.gridTemplateColumns = 'repeat(4, 1fr)';
+            }
+            
+            memoryCards.forEach((symbol, index) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card';
+                card.dataset.symbol = symbol;
+                card.dataset.index = index;
+                card.textContent = '?';
+                
+                card.addEventListener('click', () => flipCard(card));
+                memoryGame.appendChild(card);
+            });
+            
+            memoryGameContent.appendChild(memoryGame);
+            
+            // Reiniciar variáveis do jogo
+            flippedCards = [];
+            matchedPairs = 0;
+            memoryMoves = 0;
+            memorySeconds = 0;
+            
+            // Atualizar display
+            memoryLevelEl.textContent = userData.memory.level;
+            memoryPairsEl.textContent = '0 / ' + totalPairs;
+            memoryMovesEl.textContent = '0';
+            memoryTimeEl.textContent = '0s';
+            
+            // Iniciar temporizador
+            memoryTimer = setInterval(() => {
+                memorySeconds++;
+                memoryTimeEl.textContent = memorySeconds + 's';
+            }, 1000);
+        }
+        
+        // Virar carta no jogo da memória
+        function flipCard(card) {
+            if (flippedCards.length < 2 && !card.classList.contains('flipped') && !card.classList.contains('matched')) {
+                card.classList.add('flipped');
+                card.textContent = card.dataset.symbol;
+                flippedCards.push(card);
+                
+                if (flippedCards.length === 2) {
+                    memoryMoves++;
+                    memoryMovesEl.textContent = memoryMoves;
+                    checkForMatch();
+                }
+            }
+        }
+        
+        // Verificar se as cartas viradas combinam
+        function checkForMatch() {
+            const [card1, card2] = flippedCards;
+            
+            if (card1.dataset.symbol === card2.dataset.symbol) {
+                // Cartas combinam
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                matchedPairs++;
+                memoryPairsEl.textContent = matchedPairs + ' / ' + totalPairs;
+                flippedCards = [];
+                
+                // Verificar se o jogo foi completado
+                if (matchedPairs === totalPairs) {
+                    setTimeout(() => {
+                        completeMemoryGame();
+                    }, 500);
+                }
+            } else {
+                // Cartas não combinam
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    card1.textContent = '?';
+                    card2.textContent = '?';
+                    flippedCards = [];
+                }, 1000);
+            }
+        }
+        
+        // Completar jogo da memória
+        function completeMemoryGame() {
+            // Parar temporizador
+            if (memoryTimer) {
+                clearInterval(memoryTimer);
+                memoryTimer = null;
+            }
+            
+            // Atualizar dados do usuário
+            userData.gamesWon++;
+            userData.memory.level++;
+            
+            // Aumentar nível geral após 3 vitórias no jogo da memória
+            if (userData.memory.level % 3 === 0) {
+                userData.level++;
+            }
+            
+            saveUserData();
+            updateDisplay();
+            
+            // Mostrar comemoração
+            showCelebration();
+        }
+        
+        // Mostrar tela de comemoração
+        function showCelebration() {
+            const celebrationIcon = document.getElementById('celebrationIcon');
+            const celebrationTitle = document.getElementById('celebrationTitle');
+            const celebrationMessage = document.getElementById('celebrationMessage');
+            
+            // Definir ícone, título e mensagem baseado no nível
+            celebrationIcon.textContent = '🎉';
+            celebrationTitle.textContent = 'Parabéns!';
+            celebrationMessage.textContent = `Você completou o nível ${userData.memory.level - 1} do Jogo da Memória!`;
+            
+            celebration.style.display = 'flex';
+        }
+        
+        // Simular tempo de jogo (apenas para demonstração)
+        setInterval(() => {
+            userData.timePlayed++;
+            saveUserData();
+            updateDisplay();
+        }, 60000); // A cada minuto
+        
+        // Inicializar aplicativo
+        init();
+    </script>
+</body>
+</html>
