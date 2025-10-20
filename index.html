@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
@@ -25,7 +25,7 @@
             position: relative;
         }
         
-        /* Bolhas de fundo */
+        /* Bolhas de fundo - APENAS NA TELA PRINCIPAL */
         .bubble {
             position: absolute;
             border-radius: 50%;
@@ -39,7 +39,7 @@
             max-width: 500px;
             background-color: #F8F5F2; /* Branco nuvem */
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(196, 98, 98, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             padding: 20px;
             margin-top: 20px;
             position: relative;
@@ -153,7 +153,7 @@
             border: none;
             font-size: 1.8rem;
             cursor: pointer;
-            margin-right: 15px;
+            margin-left: auto; /* Mover para a direita */
             color: #6A8EAE;
             display: flex;
             align-items: center;
@@ -171,10 +171,11 @@
         .game-title {
             font-size: 1.5rem;
             color: #6A8EAE;
+            flex: 1;
+            text-align: center;
         }
         
         .game-level {
-            margin-left: auto;
             background-color: #E3A873;
             color: white;
             padding: 5px 10px;
@@ -322,7 +323,7 @@
     </style>
 </head>
 <body>
-    <!-- Bolhas de fundo -->
+    <!-- Bolhas de fundo - APENAS NA TELA PRINCIPAL -->
     <div id="bubblesContainer"></div>
     
     <!-- Página inicial com as atividades -->
@@ -397,9 +398,9 @@
     <!-- Página do Jogo da Memória -->
     <div class="game-page" id="memoryGamePage">
         <div class="game-header">
-            <button class="back-button">←</button>
             <h2 class="game-title">Jogo da Memória</h2>
             <div class="game-level">Nível <span id="memoryLevel">1</span></div>
+            <button class="back-button">←</button>
         </div>
         
         <div id="memoryGameContent"></div>
@@ -471,6 +472,30 @@
         let memoryTimer = null;
         let memorySeconds = 0;
         
+        // Conjuntos de símbolos para diferentes níveis
+        const symbolSets = [
+            // Nível 1: Frutas
+            ['🍎', '🍌', '🍒', '🍇', '🍊', '🍓', '🥝', '🍉'],
+            // Nível 2: Objetos do dia a dia
+            ['⌚', '📱', '🔑', '💡', '📚', '🖊️', '🎧', '👓'],
+            // Nível 3: Animais
+            ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'],
+            // Nível 4: Transportes
+            ['🚗', '🚲', '🚂', '✈️', '🚀', '🚁', '🚢', '🚜'],
+            // Nível 5: Esportes
+            ['⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🎱', '🏓'],
+            // Nível 6: Instrumentos musicais
+            ['🎹', '🎸', '🎺', '🥁', '🎻', '🎷', '🪕', '🎼'],
+            // Nível 7: Comidas
+            ['🍕', '🍔', '🍟', '🌭', '🥗', '🍣', '🍩', '🍦'],
+            // Nível 8: Natureza
+            ['🌞', '🌙', '⭐', '🌈', '🌺', '🌳', '🌊', '⛰️'],
+            // Nível 9: Emojis diversos
+            ['❤️', '😂', '👍', '🎉', '💡', '🎁', '🔔', '🏆'],
+            // Nível 10: Símbolos
+            ['🔴', '🟢', '🔵', '🟡', '🟠', '🟣', '⚫', '⚪']
+        ];
+        
         // Inicialização
         function init() {
             loadUserData();
@@ -479,7 +504,7 @@
             updateDisplay();
         }
         
-        // Criar bolhas de fundo
+        // Criar bolhas de fundo - APENAS NA TELA PRINCIPAL
         function createBubbles() {
             const bubbleCount = 15;
             
@@ -530,6 +555,8 @@
             // Evento para o botão de comemoração
             celebrationButton.addEventListener('click', () => {
                 celebration.style.display = 'none';
+                // Iniciar próximo nível automaticamente
+                setupMemoryGame();
             });
         }
         
@@ -557,6 +584,9 @@
         // Abrir página do jogo
         function openGamePage(gameType) {
             mainPage.style.display = 'none';
+            
+            // Remover bolhas ao sair da tela principal
+            bubblesContainer.innerHTML = '';
             
             switch(gameType) {
                 case 'memory':
@@ -586,6 +616,9 @@
             
             // Mostrar página principal
             mainPage.style.display = 'block';
+            
+            // Recriar bolhas ao voltar para a tela principal
+            createBubbles();
         }
         
         // Configurar Jogo da Memória
@@ -597,9 +630,9 @@
             totalPairs = 4 + userData.memory.level; // 5 pares no nível 1, 6 no nível 2, etc.
             if (totalPairs > 8) totalPairs = 8; // Máximo de 8 pares (16 cartas)
             
-            // Criar símbolos para as cartas
-            const symbols = ['🍎', '🍌', '🍒', '🍇', '🍊', '🍓', '🥝', '🍉', '🥭', '🍑'];
-            const selectedSymbols = symbols.slice(0, totalPairs);
+            // Selecionar conjunto de símbolos baseado no nível
+            const setIndex = Math.min(userData.memory.level - 1, symbolSets.length - 1);
+            const selectedSymbols = symbolSets[setIndex].slice(0, totalPairs);
             memoryCards = [...selectedSymbols, ...selectedSymbols];
             
             // Embaralhar cartas
@@ -729,7 +762,15 @@
             // Definir ícone, título e mensagem baseado no nível
             celebrationIcon.textContent = '🎉';
             celebrationTitle.textContent = 'Parabéns!';
-            celebrationMessage.textContent = `Você completou o nível ${userData.memory.level - 1} do Jogo da Memória!`;
+            
+            // Mensagem personalizada com base no nível alcançado
+            if (userData.memory.level <= 3) {
+                celebrationMessage.textContent = `Você completou o nível ${userData.memory.level - 1}! Continue assim!`;
+            } else if (userData.memory.level <= 6) {
+                celebrationMessage.textContent = `Excelente! Nível ${userData.memory.level - 1} concluído!`;
+            } else {
+                celebrationMessage.textContent = `Incrível! Você chegou ao nível ${userData.memory.level - 1}!`;
+            }
             
             celebration.style.display = 'flex';
         }
